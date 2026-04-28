@@ -147,6 +147,19 @@ pprof -web [PROFILE_FILE_PATH]
 * [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 * [Java](https://www.oracle.com/tw/java/technologies/downloads/)
 * [Opentelemetry Java agent](https://opentelemetry.io/docs/zero-code/java/agent/getting-started/#setup): The following examples put the agent under `otel/` directory.
+
+## Experimental .NET 10 Rewrite
+
+An initial .NET 10 rewrite now lives under [`dotnet/`](./dotnet).
+
+It currently provides a standalone in-memory implementation of the HTTP contract exposed by the Java ticket service:
+
+- `GET /v1/health_check`
+- `POST /v1/event`
+- `POST /v1/event/{id}/reservation`
+- `GET /v1/reservation/{reservationId}`
+
+See [`dotnet/README.md`](./dotnet/README.md) for run and test commands.
 ### Local Infra
 ```
 docker compose up -d
