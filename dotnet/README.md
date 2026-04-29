@@ -11,17 +11,24 @@ The .NET implementation currently focuses on the public HTTP contract from the J
 - `POST /v1/event/{id}/reservation`
 - `GET /v1/reservation/{reservationId}`
 
-It uses an in-memory event and reservation store so the project can run standalone without Kafka, Schema Registry, or RocksDB.
+The API now persists events and reservations in PostgreSQL and uses Redis to coordinate seat allocation state.
 
 ## Run
 
+Start PostgreSQL and Redis locally, then run:
+
 ```bash
-cd dotnet/src/TicketMaster.Api
+cd /home/runner/work/ticket-master/ticket-master/dotnet/src/TicketMaster.Api
 dotnet run
 ```
 
+The default connection strings come from `/home/runner/work/ticket-master/ticket-master/dotnet/src/TicketMaster.Api/appsettings.json` and can be overridden with standard ASP.NET Core configuration.
+
 ## Test
 
+The test suite uses Testcontainers to start disposable PostgreSQL and Redis containers.
+Docker must be available before running:
+
 ```bash
-dotnet test dotnet/TicketMaster.slnx
+dotnet test /home/runner/work/ticket-master/ticket-master/dotnet/TicketMaster.slnx
 ```

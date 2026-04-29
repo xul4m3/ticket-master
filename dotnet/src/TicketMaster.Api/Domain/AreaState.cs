@@ -4,32 +4,20 @@ namespace TicketMaster.Api.Domain;
 
 internal sealed class AreaState
 {
-    private readonly bool[,] _availableSeats;
-
     public AreaState(AreaRequest request)
     {
         AreaId = request.AreaId;
         Price = request.Price;
         RowCount = request.RowCount;
         ColCount = request.ColCount;
-        _availableSeats = new bool[RowCount, ColCount];
-
-        for (var row = 0; row < RowCount; row++)
-        {
-            for (var col = 0; col < ColCount; col++)
-            {
-                _availableSeats[row, col] = true;
-            }
-        }
     }
 
-    public object SyncRoot { get; } = new();
     public string AreaId { get; }
     public decimal Price { get; }
     public int RowCount { get; }
     public int ColCount { get; }
 
-    public bool TryReserveSpecific(IReadOnlyList<SeatRequest> requestedSeats, out List<SeatRequest> reservedSeats, out string failureReason)
+    public bool TryReserveSpecific(HashSet<string> reservedSeatKeys, IReadOnlyList<SeatRequest> requestedSeats, out List<SeatRequest> reservedSeats, out string failureReason)
     {
         reservedSeats = [];
         failureReason = string.Empty;
@@ -42,7 +30,7 @@ internal sealed class AreaState
                 return false;
             }
 
-            if (!_availableSeats[seat.Row, seat.Col])
+            if (reservedSeatKeys.Contains(ToSeatKey(seat.Row, seat.Col)))
             {
                 failureReason = $"Seat ({seat.Row}, {seat.Col}) is already reserved.";
                 return false;
@@ -52,13 +40,13 @@ internal sealed class AreaState
         reservedSeats = requestedSeats.Select(seat => new SeatRequest { Row = seat.Row, Col = seat.Col }).ToList();
         foreach (var seat in reservedSeats)
         {
-            _availableSeats[seat.Row, seat.Col] = false;
+            reservedSeatKeys.Add(ToSeatKey(seat.Row, seat.Col));
         }
 
         return true;
     }
 
-    public bool TryReserveFirstAvailable(int seatCount, out List<SeatRequest> reservedSeats, out string failureReason)
+    public bool TryReserveFirstAvailable(int seatCount, HashSet<string> reservedSeatKeys, out List<SeatRequest> reservedSeats, out string failureReason)
     {
         reservedSeats = [];
         failureReason = string.Empty;
@@ -67,7 +55,7 @@ internal sealed class AreaState
         {
             for (var col = 0; col < ColCount && reservedSeats.Count < seatCount; col++)
             {
-                if (!_availableSeats[row, col])
+                if (reservedSeatKeys.Contains(ToSeatKey(row, col)))
                 {
                     continue;
                 }
@@ -84,7 +72,7 @@ internal sealed class AreaState
 
         foreach (var seat in reservedSeats)
         {
-            _availableSeats[seat.Row, seat.Col] = false;
+            reservedSeatKeys.Add(ToSeatKey(seat.Row, seat.Col));
         }
 
         return true;
@@ -95,4 +83,6 @@ internal sealed class AreaState
         seat.Col >= 0 &&
         seat.Row < RowCount &&
         seat.Col < ColCount;
+
+    private static string ToSeatKey(int row, int col) => $"{row}:{col}";
 }
