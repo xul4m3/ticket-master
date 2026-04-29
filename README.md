@@ -152,7 +152,7 @@ pprof -web [PROFILE_FILE_PATH]
 
 An initial .NET 10 rewrite now lives under [`dotnet/`](./dotnet).
 
-It currently provides a standalone in-memory implementation of the HTTP contract exposed by the Java ticket service:
+It currently provides a standalone PostgreSQL/Redis-backed implementation of the HTTP contract exposed by the Java ticket service:
 
 - `GET /v1/health_check`
 - `POST /v1/event`

@@ -35,7 +35,7 @@ public sealed class TicketMasterPersistenceFixture : IAsyncLifetime
         await _redis.StartAsync();
 
         DataSource = NpgsqlDataSource.Create(_postgres.GetConnectionString());
-        ConnectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(_redis.GetConnectionString());
+        ConnectionMultiplexer = await StackExchange.Redis.ConnectionMultiplexer.ConnectAsync(_redis.GetConnectionString());
 
         await CreateStore().InitializeAsync();
         await ResetAsync();

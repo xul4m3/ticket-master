@@ -5,8 +5,7 @@ namespace TicketMaster.Api.Services;
 internal sealed class RedisReservationLock : IAsyncDisposable
 {
     private const int LockTimeoutSeconds = 30;
-    private static readonly LuaScript ReleaseScript = LuaScript.Prepare(
-        "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end");
+    private const string ReleaseScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
 
     private readonly IDatabase _database;
     private readonly RedisKey _key;
